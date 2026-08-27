@@ -13,22 +13,28 @@ headers = {
 url_send = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.SendRequest?t={token}&q={query_id}&v=3"
 
 print("Solicitando generación de reporte a IBKR...")
-response = requests.get(url_send, headers=headers)
-root = ET.fromstring(response.text)
 
-status = root.find(".//Status") or root.find(".//status")
+reference_code = None
+for i in range(1, 6):
+    response = requests.get(url_send, headers=headers)
+    root = ET.fromstring(response.text)
+    status = root.find(".//Status") or root.find(".//status")
+    
+    if status is not None and status.text == "Success":
+        ref = root.find(".//ReferenceCode") or root.find(".//referenceCode")
+        reference_code = ref.text
+        print(f"Referencia obtenida con éxito: {reference_code}")
+        break
+    else:
+        err = root.find(".//ErrorMessage") or root.find(".//errorMessage")
+        msg = err.text if err is not None else response.text
+        print(f"Intento {i}/5: IBKR compilando ({msg}). Esperando 20s...")
+        time.sleep(20)
 
-if status is None or status.text != "Success":
-    error_elem = root.find(".//ErrorMessage") or root.find(".//errorMessage")
-    msg = error_elem.text if error_elem is not None else response.text
-    raise Exception(f"Fallo al solicitar reporte: {msg}")
+if not reference_code:
+    raise Exception("IBKR no pudo entregar el reporte tras 5 intentos.")
 
-ref_elem = root.find(".//ReferenceCode") or root.find(".//referenceCode")
-reference_code = ref_elem.text
-
-print(f"Reporte solicitado con éxito. Reference code: {reference_code}")
-print("Esperando 20 segundos a que IBKR compile el CSV...")
-time.sleep(20)
+time.sleep(15)
 
 url_get = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.GetStatement?q={reference_code}&t={token}&v=3"
 
@@ -36,4 +42,4 @@ csv_response = requests.get(url_get, headers=headers)
 with open("IBKR_Portofolio_Dashboard 2026.csv", "w", encoding="utf-8") as f:
     f.write(csv_response.text)
 
-print("¡Archivo CSV descargado y actualizado con éxito!")
+print("¡Archivo 'IBKR_Portofolio_Dashboard 2026.csv' guardado y actualizado con éxito!")
