@@ -10,51 +10,46 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
 
-url_send = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.SendRequest?t={token}&q={query_id}&v=3"
-
-print("Solicitando generación de reporte a IBKR...")
+endpoints = [
+    "https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.SendRequest",
+    "https://www.interactivebrokers.co.uk/Universal/servlet/FlexStatementService.SendRequest"
+]
 
 reference_code = None
-for intento in range(1, 6):
-    response = requests.get(url_send, headers=headers)
+
+print("Solicitando generación de reporte a IBKR...")
+for url in endpoints:
+    params = {"t": token, "q": query_id, "v": "3"}
     try:
+        response = requests.get(url, params=params, headers=headers, timeout=30)
         root = ET.fromstring(response.text)
-        status = root.find(".//Status") or root.find(".//status")
         
+        status = root.find(".//Status") or root.find(".//status")
         if status is not None and status.text == "Success":
             ref = root.find(".//ReferenceCode") or root.find(".//referenceCode")
             reference_code = ref.text
-            print(f"Código de referencia obtenido: {reference_code}")
+            print(f"Éxito con endpoint {url}")
+            print(f"Código de referencia: {reference_code}")
             break
         else:
             err = root.find(".//ErrorMessage") or root.find(".//errorMessage")
             msg = err.text if err is not None else response.text
-            print(f"Intento {intento}/5: IBKR respondió '{msg}'. Reintentando en 15s...")
+            print(f"Respuesta de {url}: {msg}")
     except Exception as e:
-        print(f"Intento {intento}/5: Error de conexión ({e}). Reintentando en 15s...")
-    
-    time.sleep(15)
+        print(f"Error conectando a {url}: {e}")
 
 if not reference_code:
-    raise Exception("No se pudo obtener el código de referencia tras varios intentos.")
+    raise Exception("No se pudo generar el reporte en IBKR. Revise Query ID / Token.")
 
-print("Esperando 15 segundos para la consolidación del archivo...")
-time.sleep(15)
+print("Esperando 20 segundos a que IBKR genere el archivo...")
+time.sleep(20)
 
-url_get = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.GetStatement?q={reference_code}&t={token}&v=3"
+get_url = "https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.GetStatement"
+get_params = {"q": reference_code, "t": token, "v": "3"}
 
-statement_downloaded = False
-for intento in range(1, 6):
-    csv_response = requests.get(url_get, headers=headers)
-    if "<ErrorCode>" in csv_response.text or "<Status>Warn</Status>" in csv_response.text:
-        print(f"Intento {intento}/5: El archivo aún se está generando. Esperando 10s...")
-        time.sleep(10)
-    else:
-        with open("IBKR_Portofolio_Dashboard 2026.csv", "w", encoding="utf-8") as f:
-            f.write(csv_response.text)
-        statement_downloaded = True
-        print("¡Archivo CSV descargado y guardado como 'IBKR_Portofolio_Dashboard 2026.csv' con éxito!")
-        break
+csv_response = requests.get(get_url, params=get_params, headers=headers, timeout=60)
 
-if not statement_downloaded:
-    raise Exception("El servidor de IBKR no entregó el archivo a tiempo.")
+with open("IBKR_Portofolio_Dashboard 2026.csv", "w", encoding="utf-8") as f:
+    f.write(csv_response.text)
+
+print("¡Archivo CSV descargado y guardado como 'IBKR_Portofolio_Dashboard 2026.csv' con éxito!")
