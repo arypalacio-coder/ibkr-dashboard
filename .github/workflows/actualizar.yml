@@ -2,7 +2,6 @@ name: Actualizar Portafolio IBKR
 
 on:
   schedule:
-    # Se ejecuta 10 veces al día (cada hora desde las 13:00 hasta las 22:00 UTC, lunes a viernes)
     - cron: '0 13-22 * * 1-5'
   workflow_dispatch:
 
@@ -33,4 +32,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add IBKR_Portofolio_Dashboard.csv
           git commit -m "Actualizacion automatica de datos IBKR [skip ci]" || exit 0
+          git pull --rebase origin main
           git push
