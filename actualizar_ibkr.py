@@ -10,33 +10,46 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
 
-# Endpoint oficial actualizado de IBKR Flex Web Service
 url_send = f"https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService/SendRequest?t={token}&q={query_id}&v=3"
 
 print("Solicitando generación de reporte a IBKR...")
 response = requests.get(url_send, headers=headers)
+print("Respuesta IBKR:", response.text)
+
 root = ET.fromstring(response.text)
 
-status = root.find(".//Status")
-if status is None:
-    status = root.find(".//status")
+# Búsqueda insensible a mayúsculas/minúsculas de Status
+status = None
+for elem in root.iter():
+    if elem.tag.lower().endswith("status"):
+        status = elem.text
+        break
 
-if status is None or status.text != "Success":
-    error_elem = root.find(".//ErrorMessage") or root.find(".//errorMessage")
-    msg = error_elem.text if error_elem is not None else response.text
-    raise Exception(f"Fallo al solicitar reporte: {msg}")
+if status != "Success":
+    err_msg = response.text
+    for elem in root.iter():
+        if elem.tag.lower().endswith("errormessage"):
+            err_msg = elem.text
+            break
+    raise Exception(f"Fallo al solicitar reporte: {err_msg}")
 
-ref_elem = root.find(".//ReferenceCode") or root.find(".//referenceCode")
-reference_code = ref_elem.text
+# Búsqueda insensible de ReferenceCode
+reference_code = None
+for elem in root.iter():
+    if elem.tag.lower().endswith("referencecode"):
+        reference_code = elem.text
+        break
+
+if not reference_code:
+    raise Exception(f"No se encontró código de referencia en el XML: {response.text}")
 
 print(f"Reporte solicitado con éxito. Reference code: {reference_code}")
-print("Esperando 15 segundos a que IBKR genere el archivo...")
+print("Esperando 15 segundos a que IBKR compile el CSV...")
 time.sleep(15)
 
-# Endpoint oficial de descarga
 url_get = f"https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService/GetStatement?q={reference_code}&t={token}&v=3"
-
 csv_response = requests.get(url_get, headers=headers)
+
 with open("IBKR_Portofolio_Dashboard 2026.csv", "w", encoding="utf-8") as f:
     f.write(csv_response.text)
 
