@@ -10,36 +10,34 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
 
-url_send = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.SendRequest?t={token}&q={query_id}&v=3"
+# Endpoint oficial actualizado de IBKR Flex Web Service
+url_send = f"https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService/SendRequest?t={token}&q={query_id}&v=3"
 
 print("Solicitando generación de reporte a IBKR...")
+response = requests.get(url_send, headers=headers)
+root = ET.fromstring(response.text)
 
-reference_code = None
-for i in range(1, 6):
-    response = requests.get(url_send, headers=headers)
-    root = ET.fromstring(response.text)
-    status = root.find(".//Status") or root.find(".//status")
-    
-    if status is not None and status.text == "Success":
-        ref = root.find(".//ReferenceCode") or root.find(".//referenceCode")
-        reference_code = ref.text
-        print(f"Referencia obtenida con éxito: {reference_code}")
-        break
-    else:
-        err = root.find(".//ErrorMessage") or root.find(".//errorMessage")
-        msg = err.text if err is not None else response.text
-        print(f"Intento {i}/5: IBKR compilando ({msg}). Esperando 20s...")
-        time.sleep(20)
+status = root.find(".//Status")
+if status is None:
+    status = root.find(".//status")
 
-if not reference_code:
-    raise Exception("IBKR no pudo entregar el reporte tras 5 intentos.")
+if status is None or status.text != "Success":
+    error_elem = root.find(".//ErrorMessage") or root.find(".//errorMessage")
+    msg = error_elem.text if error_elem is not None else response.text
+    raise Exception(f"Fallo al solicitar reporte: {msg}")
 
+ref_elem = root.find(".//ReferenceCode") or root.find(".//referenceCode")
+reference_code = ref_elem.text
+
+print(f"Reporte solicitado con éxito. Reference code: {reference_code}")
+print("Esperando 15 segundos a que IBKR genere el archivo...")
 time.sleep(15)
 
-url_get = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.GetStatement?q={reference_code}&t={token}&v=3"
+# Endpoint oficial de descarga
+url_get = f"https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService/GetStatement?q={reference_code}&t={token}&v=3"
 
 csv_response = requests.get(url_get, headers=headers)
 with open("IBKR_Portofolio_Dashboard 2026.csv", "w", encoding="utf-8") as f:
     f.write(csv_response.text)
 
-print("¡Archivo 'IBKR_Portofolio_Dashboard 2026.csv' guardado y actualizado con éxito!")
+print("¡Archivo 'IBKR_Portofolio_Dashboard 2026.csv' guardado y actualizado con éxito en GitHub!")
