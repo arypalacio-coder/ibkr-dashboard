@@ -18,7 +18,7 @@ for intento in range(3):
     status = root.find(".//status")
     if status is not None and status.text == "Success":
         reference_code = root.find(".//referenceCode").text
-        print(Reference code obtenido: {reference_code})
+        print(f"Reference code obtenido: {reference_code}")
         break
     else:
         error_msg = root.find(".//errorMessage")
@@ -38,7 +38,3 @@ with open("IBKR_Portofolio_Dashboard.csv", "w", encoding="utf-8") as f:
     f.write(csv_response.text)
 
 print("¡Archivo CSV descargado y actualizado con éxito!")
-
-if not descargado:
-    print("No se pudo obtener el reporte después de los intentos programados.")
-    sys.exit(1)
