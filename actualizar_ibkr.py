@@ -39,7 +39,7 @@ time.sleep(15)
 url_get = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.GetStatement?q={reference_code}&t={token}&v=3"
 
 csv_response = requests.get(url_get, headers=headers)
-with open("IBKR_Portofolio_Dashboard.csv", "w", encoding="utf-8") as f:
+with open("IBKR_Portofolio_Dashboard 2026.csv", "w", encoding="utf-8") as f:
     f.write(csv_response.text)
 
 print("¡Archivo CSV descargado y actualizado con éxito!")
