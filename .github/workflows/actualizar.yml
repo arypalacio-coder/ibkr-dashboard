@@ -2,9 +2,9 @@ name: Actualizar Portafolio IBKR
 
 on:
   schedule:
-    # Se ejecuta de lunes a viernes a las 13:00, 17:00 y 21:00 UTC
-    - cron: '0 13,17,21 * * 1-5'
-  workflow_dispatch: # Botón para ejecutar manualmente cuando se desee
+    # Se ejecuta 10 veces al día (cada hora desde las 13:00 hasta las 22:00 UTC, lunes a viernes)
+    - cron: '0 13-22 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   actualizar-datos:
