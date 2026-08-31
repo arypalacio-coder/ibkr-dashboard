@@ -2,8 +2,12 @@ name: Actualizar Portafolio IBKR
 
 on:
   schedule:
-    - cron: '0 13-22 * * 1-5'
+    # Se ejecuta cada hora en el minuto 15, entre las 13:15 UTC (09:15 local) y 22:15 UTC (18:15 local) L-V
+    - cron: '15 13-22 * * 1-5'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   actualizar-datos:
@@ -11,6 +15,8 @@ jobs:
     steps:
       - name: Clonar repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v5
