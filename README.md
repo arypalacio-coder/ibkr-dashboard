@@ -2,6 +2,8 @@
 
 Sistema integral de inteligencia financiera diseñado para automatizar la extracción de datos, modelado cuantitativo de riesgo y reportería ejecutiva para portafolios de inversión.
 
+---
+
 ## 🏛️ Arquitectura del Pipeline
 
 ```mermaid
@@ -11,6 +13,8 @@ flowchart LR
     B -->|Ingesta Automatizada| D[Power Query M]
     D -->|Modelo Estrella| E[Modelo Semántico DAX]
     E -->|Analítica de Riesgo| F[Power BI Dashboard]
+```
+
 ---
 
 ## 📊 Modelo Relacional (Esquema Estrella)
@@ -33,3 +37,11 @@ flowchart LR
 * **Maximum Drawdown (Underwater Curve):** Máxima caída porcentual histórica de capital desde el pico más alto.
 * **Alpha vs. SPY:** Exceso de retorno acumulado de la cartera respecto al benchmark en Base 100.
 * **Conciliación Contable (Waterfall):** Cuadratura exacta entre depósitos netos, MTM, ingresos por dividendos, deducciones por tasas y retenciones fiscales frente al NAV final.
+
+---
+
+## 🛠️ Retos de Ingeniería Resueltos
+
+* **Deduplicación dinámica en Power Query (M):** Limpieza y control de solapamiento temporal en extracciones programadas de la API.
+* **Alineación temporal con Benchmark:** Sincronización continua de días bursátiles y no hábiles mediante `Dim_Calendario`.
+* **Conciliación de flujos contables:** Eliminación de duplicidades en totales calculados del gráfico de cascada.
