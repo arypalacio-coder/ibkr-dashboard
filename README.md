@@ -1,4 +1,4 @@
-# Portfolio & Financial Risk Analytics Engine
+﻿# Portfolio & Financial Risk Analytics Engine
 
 Production-grade financial engineering pipeline and intelligence system automating data ingestion from Interactive Brokers, quantitative risk modeling, and executive reporting.
 
