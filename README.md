@@ -1,10 +1,10 @@
 # Portfolio & Financial Risk Analytics Engine
 
-End-to-end financial intelligence system designed to automate data extraction, quantitative risk modeling, and executive reporting for investment portfolios.
+Production-grade financial engineering pipeline and intelligence system automating data ingestion from Interactive Brokers, quantitative risk modeling, and executive reporting.
 
 ---
 
-## Arquitectura del Pipeline
+## Pipeline Architecture
 
 `mermaid
 flowchart LR
@@ -17,31 +17,31 @@ flowchart LR
 
 ---
 
-## Modelo Relacional (Esquema Estrella)
+## Relational Model (Star Schema)
 
-* **Tablas de Hechos (Fact Tables):**
-  * Fact_PortfolioDaily: Valor liquidativo diario (NAV), flujos de efectivo y saldo Mark-to-Market.
-  * Fact_Trades: Registro atomico de ejecuciones, tamano de ordenes, PnL realizado y comisiones.
-  * Fact_Dividends: Dividendos brutos, retenciones fiscales (Withholding Tax) y pagos netos.
-  * Fact_Benchmark_SPY: Precios de cierre ajustados y retornos diarios del S&P 500.
-* **Tablas de Dimensiones (Dim Tables):**
-  * Dim_Calendario: Eje temporal maestro continuo.
-  * Dim_Asset: Clasificacion dinamica por clase de activo (Renta Variable, Renta Fija, Materias Primas, Liquidez).
-  * Dim_CambioNAV: Jerarquia contable para la conciliacion de variacion patrimonial.
-
----
-
-## Metricas Cuantitativas de Riesgo
-
-* **Annualized Sharpe Ratio:** Rendimiento excedente ponderado por unidad de volatilidad total (Rf configurable).
-* **Maximum Drawdown (MDD):** Perdida maxima acumulada pico a valle a lo largo de la serie temporal.
-* **Portfolio Beta:** Sensibilidad sistematica del portafolio frente a los movimientos del benchmark (SPY).
-* **Jensen Alpha:** Generacion de retorno anormal ajustado por riesgo bajo el modelo CAPM.
+* **Fact Tables:**
+  * Fact_PortfolioDaily: Daily Net Asset Value (NAV), cash flows, and Mark-to-Market valuation.
+  * Fact_Trades: Atomic execution logs, trade sizing, realized PnL, and broker commissions.
+  * Fact_Dividends: Gross dividend cashflows, withholding tax withholding, and net settlements.
+  * Fact_Benchmark_SPY: S&P 500 adjusted close prices and daily benchmark returns.
+* **Dimension Tables:**
+  * Dim_Calendario: Continuous master calendar hierarchy.
+  * Dim_Asset: Dynamic classification by asset class (Equities, Fixed Income, Commodities, Cash).
+  * Dim_CambioNAV: Accounting hierarchy for equity variation reconciliation.
 
 ---
 
-## Stack Tecnologico
+## Quantitative Risk Metrics
+
+* **Annualized Sharpe Ratio:** Excess return per unit of total portfolio volatility (configurable Rf).
+* **Maximum Drawdown (MDD):** Peak-to-trough maximum observed cumulative portfolio loss.
+* **Portfolio Beta:** Systematic risk exposure relative to benchmark movements (SPY).
+* **Jensen Alpha:** Risk-adjusted abnormal return generation modeled under CAPM.
+
+---
+
+## Technical Stack
 
 * **Data Engineering & Automation:** Python 3.11 (pandas, requests, yfinance), Interactive Brokers Flex Web Service API.
-* **CI/CD Pipeline:** GitHub Actions (extraccion programada Martes a Sabado post-cierre de mercado).
-* **Modeling & Analytics:** Power BI, DAX cuantitativo, Star Schema Dimensional Modeling.
+* **CI/CD Pipeline:** GitHub Actions (scheduled automated runs Tuesday to Saturday post market close).
+* **Modeling & Analytics:** Power BI, Quantitative DAX, Star Schema Dimensional Modeling.
