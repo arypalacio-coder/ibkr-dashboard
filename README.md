@@ -1,47 +1,47 @@
 # Portfolio & Financial Risk Analytics Engine
 
-Sistema integral de inteligencia financiera diseñado para automatizar la extracción de datos, modelado cuantitativo de riesgo y reportería ejecutiva para portafolios de inversión.
+End-to-end financial intelligence system designed to automate data extraction, quantitative risk modeling, and executive reporting for investment portfolios.
 
 ---
 
-## 🏛️ Arquitectura del Pipeline
+## Arquitectura del Pipeline
 
-```mermaid
+`mermaid
 flowchart LR
-    A[Interactive Brokers Flex API] -->|Extracción Diaria| B(GitHub Actions CI/CD)
-    C[Yahoo Finance / Stooq API] -->|Benchmark SPY| B
-    B -->|Ingesta Automatizada| D[Power Query M]
-    D -->|Modelo Estrella| E[Modelo Semántico DAX]
-    E -->|Analítica de Riesgo| F[Power BI Dashboard]
-```
+    A[Interactive Brokers Flex API] -->|Daily Extraction| B(GitHub Actions CI/CD)
+    C[Yahoo Finance API] -->|Benchmark SPY| B
+    B -->|Automated Ingestion| D[Data Lake / CSV Datasets]
+    D -->|Star Schema| E[Semantic Model DAX]
+    E -->|Risk Analytics| F[Power BI Executive Dashboard]
+`
 
 ---
 
-## 📊 Modelo Relacional (Esquema Estrella)
+## Modelo Relacional (Esquema Estrella)
 
 * **Tablas de Hechos (Fact Tables):**
-  * `Fact_PortfolioDaily`: Valor liquidativo diario (NAV), flujos de efectivo y saldo Mark-to-Market.
-  * `Fact_Trades`: Registro atómico de ejecuciones, tamaño de órdenes, PnL realizado y comisiones.
-  * `Fact_Dividends`: Dividendos brutos, retenciones fiscales (Withholding Tax) y pagos netos.
-  * `Fact_Benchmark_SPY`: Precios de cierre ajustados y retornos diarios del S&P 500.
+  * Fact_PortfolioDaily: Valor liquidativo diario (NAV), flujos de efectivo y saldo Mark-to-Market.
+  * Fact_Trades: Registro atomico de ejecuciones, tamano de ordenes, PnL realizado y comisiones.
+  * Fact_Dividends: Dividendos brutos, retenciones fiscales (Withholding Tax) y pagos netos.
+  * Fact_Benchmark_SPY: Precios de cierre ajustados y retornos diarios del S&P 500.
 * **Tablas de Dimensiones (Dim Tables):**
-  * `Dim_Calendario`: Eje temporal maestro continuo.
-  * `Dim_Asset`: Clasificación dinámica por clase de activo (Renta Variable, Renta Fija, Materias Primas, Crypto).
-  * `Dim_CambioNAV`: Jerarquía contable para la conciliación de variación patrimonial.
+  * Dim_Calendario: Eje temporal maestro continuo.
+  * Dim_Asset: Clasificacion dinamica por clase de activo (Renta Variable, Renta Fija, Materias Primas, Liquidez).
+  * Dim_CambioNAV: Jerarquia contable para la conciliacion de variacion patrimonial.
 
 ---
 
-## 📐 Métricas Cuantitativas Implementadas (DAX)
+## Metricas Cuantitativas de Riesgo
 
-* **Sharpe Ratio (1Y):** Relación de retorno ajustado por riesgo sobre volatilidad anualizada ($\sigma \times \sqrt{252}$).
-* **Maximum Drawdown (Underwater Curve):** Máxima caída porcentual histórica de capital desde el pico más alto.
-* **Alpha vs. SPY:** Exceso de retorno acumulado de la cartera respecto al benchmark en Base 100.
-* **Conciliación Contable (Waterfall):** Cuadratura exacta entre depósitos netos, MTM, ingresos por dividendos, deducciones por tasas y retenciones fiscales frente al NAV final.
+* **Annualized Sharpe Ratio:** Rendimiento excedente ponderado por unidad de volatilidad total (Rf configurable).
+* **Maximum Drawdown (MDD):** Perdida maxima acumulada pico a valle a lo largo de la serie temporal.
+* **Portfolio Beta:** Sensibilidad sistematica del portafolio frente a los movimientos del benchmark (SPY).
+* **Jensen Alpha:** Generacion de retorno anormal ajustado por riesgo bajo el modelo CAPM.
 
 ---
 
-## 🛠️ Retos de Ingeniería Resueltos
+## Stack Tecnologico
 
-* **Deduplicación dinámica en Power Query (M):** Limpieza y control de solapamiento temporal en extracciones programadas de la API.
-* **Alineación temporal con Benchmark:** Sincronización continua de días bursátiles y no hábiles mediante `Dim_Calendario`.
-* **Conciliación de flujos contables:** Eliminación de duplicidades en totales calculados del gráfico de cascada.
+* **Data Engineering & Automation:** Python 3.11 (pandas, requests, yfinance), Interactive Brokers Flex Web Service API.
+* **CI/CD Pipeline:** GitHub Actions (extraccion programada Martes a Sabado post-cierre de mercado).
+* **Modeling & Analytics:** Power BI, DAX cuantitativo, Star Schema Dimensional Modeling.

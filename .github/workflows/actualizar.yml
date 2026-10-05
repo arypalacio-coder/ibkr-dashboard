@@ -2,8 +2,8 @@ name: Actualizar Portafolio IBKR
 
 on:
   schedule:
-    # Se ejecuta de Martes a Sábado a las 08:15 UTC (04:15 AM hora local)
-    # Extrae la jornada cerrada y consolidada del día anterior (Lunes a Viernes)
+    # Se ejecuta de Martes a Sabado a las 08:15 UTC (04:15 AM hora local)
+    # Extrae la jornada cerrada y consolidada del dia anterior (Lunes a Viernes)
     - cron: '15 8 * * 2-6'
   workflow_dispatch:
 
